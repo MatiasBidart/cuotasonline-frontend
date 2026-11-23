@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CuotasOnline — Frontend
 
-## Getting Started
+Aplicación web con Next.js, React y Tailwind CSS para administrar clientes, vendedores, productos, ventas y planes de cuotas.
 
-First, run the development server:
+## Desarrollo local
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+1. Iniciá el backend desde `../backend` con `npm run dev`; siempre escucha en `http://localhost:3000`.
+2. Instalá dependencias con `npm install`.
+3. Iniciá el frontend con `npm run dev` y abrí `http://localhost:3001`; Next.js usa siempre el puerto 3001.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+En desarrollo local, el frontend llama a `http://localhost:3000/api` y no hace falta configurar `.env.local` ni `NEXT_PUBLIC_API_URL`. El frontend llama a la API Express y no usa datos de demostración. El backend conserva las credenciales de Supabase; no configures la clave de servicio en este proyecto.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Despliegue
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+En el proveedor de Next.js, configurá `NEXT_PUBLIC_API_URL` con la URL pública del backend más `/api` (por ejemplo, `https://api.ejemplo.com/api`) y volvé a desplegar. En el backend configurá `FRONTEND_URL` con el dominio público del frontend. En producción no se usa `localhost` como destino alternativo, para evitar que la app intente conectarse a la computadora de cada visitante. Los puertos fijos 3000 y 3001 corresponden al desarrollo local.
 
-## Learn More
+Para crear las cuentas locales de prueba (administrador, cliente y vendedor), seguí la sección **Cuentas locales de prueba** en el README del backend. En modo desarrollo, el formulario de inicio ofrece botones para completar esos accesos. No borres la información actual de la base para probarlos.
 
-To learn more about Next.js, take a look at the following resources:
+Los enlaces públicos de completar cuenta duran 20 minutos y solo pueden usarse una vez. Para enviar invitaciones, configurá SMTP y `FRONTEND_URL` en el `.env` del backend y aplicá la migración Supabase indicada en su README.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+El detalle compartible de cada producto está en `/producto/<id>`. Para una experiencia offline tipo Google Keep hace falta una PWA con almacenamiento local y una cola de sincronización idempotente; las ventas no deben figurar como confirmadas hasta que el backend las acepte. Esto queda como una etapa aparte para evitar prometer que una venta offline ya quedó registrada.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Funcionalidades
 
-## Deploy on Vercel
+- Inicio de sesión de Supabase y panel adaptado al rol administrador, vendedor o cliente.
+- Resumen, directorios, ficha de contacto de clientes, productos, ventas y cuotas pendientes.
+- Alta de productos con descripción y URL de imagen.
+- Alta de cuentas de cliente y vendedor desde administración.
+- Registro de ventas por parte del vendedor.
+- Contactos de clientes con teléfono, domicilio y URL de Google Maps; la ficha muestra el botón **Ubicación** cuando hay un enlace válido.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Al crear una cuenta de cliente, completá **Domicilio** y, si está disponible, **Link al Mapa** con una URL de Google Maps. En la ficha del cliente, el botón **Ubicación** abre ese enlace en otra pestaña. La API valida el formato de la URL. La migración `202611230001_contact_map_link.sql` del backend debe aplicarse en Supabase antes de enviar este campo; esta también elimina el antiguo `streets_between`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+El backend todavía no registra pagos parciales, por lo que los planes se muestran íntegramente pendientes.
